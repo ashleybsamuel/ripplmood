@@ -506,19 +506,14 @@ export default function App() {
   return (
     <div id="koi-app" className="relative min-h-screen text-[#e1e3e2] select-none flex flex-col items-center bg-[#0a1614]">
       {/* Dynamic Background Image - high-fidelity koi pond backdrop */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#0a1614]">
-        <img 
-          src="/KoiFish_Background.webp" 
-          alt="Koi Pond Background" 
-          className="w-full h-full object-cover object-center transition-all duration-700 ease-in-out"
-          style={{ objectFit: "cover", objectPosition: "center" }}
-          onError={(e) => {
-            if (koiPondBackground && e.currentTarget.src !== koiPondBackground) {
-              e.currentTarget.src = koiPondBackground;
-            }
-          }}
-        />
-      </div>
+      <div 
+        className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#0a1614] bg-cover bg-center transition-all duration-700 ease-in-out"
+        style={{ 
+          backgroundImage: `url(${koiPondBackground || '/KoiFish_Background.webp'})`,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover'
+        }}
+      />
 
       {/* Top Header & Navigation Bar */}
       <header id="koi-header" className="sticky top-0 w-full max-w-7xl px-4 sm:px-8 pt-4 pb-2 z-40 transition-all duration-300">
