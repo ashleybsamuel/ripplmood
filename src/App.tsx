@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 // @ts-ignore
-import koiPondBackground from "./assets/images/koifish_background.jpeg";
+import koiPondBackground from "./assets/images/KoiFish_Background.webp";
 import { 
   Moon, 
   BookOpen, 
@@ -504,19 +504,16 @@ export default function App() {
   }, [currentScreen]);
 
   return (
-    <div id="koi-app" className="relative min-h-screen text-[#e1e3e2] select-none flex flex-col items-center">
+    <div id="koi-app" className="relative min-h-screen text-[#e1e3e2] select-none flex flex-col items-center bg-[#0a1614]">
       {/* Dynamic Background Image - high-fidelity koi pond backdrop */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#0a1614]">
         <img 
-          src="/koifish-bg.jpeg" 
+          src="/KoiFish_Background.webp" 
           alt="Koi Pond Background" 
           className="w-full h-full object-cover object-center transition-all duration-700 ease-in-out"
           style={{ objectFit: "cover", objectPosition: "center" }}
           onError={(e) => {
-            const currentSrc = e.currentTarget.src;
-            if (!currentSrc.includes("KoiFish%20Background.jpeg") && !currentSrc.includes("KoiFish Background.jpeg")) {
-              e.currentTarget.src = "/KoiFish Background.jpeg";
-            } else if (koiPondBackground && currentSrc !== koiPondBackground) {
+            if (koiPondBackground && e.currentTarget.src !== koiPondBackground) {
               e.currentTarget.src = koiPondBackground;
             }
           }}
