@@ -760,7 +760,15 @@ export default function App() {
               <div className="w-full grid lg:grid-cols-2 gap-4 lg:gap-8 items-stretch justify-center">
                 
                 {/* Left Panel: How are you feeling today? */}
-                <section className="glass-panel rounded-[20px] sm:rounded-[24px] p-4 sm:p-8 md:p-10 flex flex-col items-center justify-between relative overflow-hidden h-auto lg:h-[630px]">
+                <section 
+                  className="glass-panel rounded-[20px] sm:rounded-[24px] p-4 sm:p-8 md:p-10 flex flex-col items-center justify-between relative overflow-hidden h-auto lg:h-[630px]"
+                  style={{
+                    background: "rgba(10, 20, 20, 0.35)",
+                    backdropFilter: "blur(24px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.25)"
+                  }}
+                >
                   <div className="text-center mt-1 sm:mt-2 z-10">
                     <h2 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest text-white leading-tight uppercase">
                       HOW ARE YOU<br />FEELING TODAY?
@@ -840,7 +848,15 @@ export default function App() {
                 </section>
 
                 {/* Right Panel: What did you do today? */}
-                <section className="glass-panel rounded-[20px] sm:rounded-[24px] p-4 sm:p-8 md:p-10 flex flex-col justify-between h-auto lg:h-[630px]">
+                <section 
+                  className="glass-panel rounded-[20px] sm:rounded-[24px] p-4 sm:p-8 md:p-10 flex flex-col justify-between h-auto lg:h-[630px]"
+                  style={{
+                    background: "rgba(10, 20, 20, 0.35)",
+                    backdropFilter: "blur(24px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.25)"
+                  }}
+                >
                   <div className="text-center mt-1 sm:mt-2">
                     <h2 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest text-white uppercase leading-tight">
                       WHAT DID YOU DO TODAY?
@@ -920,7 +936,15 @@ export default function App() {
               <div className="w-full grid lg:grid-cols-2 gap-8 items-stretch justify-center">
                 
                 {/* Left Panel: Reflection Summary (Orb, Active list, July 2026 Calendar) */}
-                <section className="glass-panel rounded-[24px] p-6 md:p-8 flex flex-col justify-between relative h-auto min-h-[580px]">
+                <section 
+                  className="glass-panel rounded-[24px] p-6 md:p-8 flex flex-col justify-between relative h-auto min-h-[580px]"
+                  style={{
+                    background: "rgba(10, 20, 20, 0.35)",
+                    backdropFilter: "blur(24px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.25)"
+                  }}
+                >
                   <div>
                     <h2 className="text-lg md:text-xl font-light tracking-wider text-white mb-4 uppercase">
                       REFLECTION SUMMARY
@@ -1159,7 +1183,16 @@ export default function App() {
                 </section>
 
                 {/* Right Panel: AI Guidance & Poetic Koi Illustration */}
-                <section id="ai-guidance-section" className="glass-panel rounded-[24px] flex-1 p-6 md:p-10 flex flex-col justify-between relative h-auto min-h-[580px]">
+                <section 
+                  id="ai-guidance-section" 
+                  className="glass-panel rounded-[24px] flex-1 p-6 md:p-10 flex flex-col justify-between relative h-auto min-h-[580px]"
+                  style={{
+                    background: "rgba(10, 20, 20, 0.35)",
+                    backdropFilter: "blur(24px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.25)"
+                  }}
+                >
                   <div className="z-10">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                       <h2 className="text-xl md:text-2xl font-light tracking-wider text-white uppercase">
