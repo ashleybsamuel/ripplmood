@@ -693,10 +693,10 @@ export default function App() {
               <div 
                 className="glass-panel rounded-[28px] sm:rounded-[32px] w-full p-6 sm:p-10 md:p-16 flex flex-col items-center justify-center gap-6 sm:gap-10 md:gap-12 min-h-[340px] sm:min-h-[500px] text-center relative overflow-hidden"
                 style={{ 
-                  background: "rgba(255, 255, 255, 0.04)", 
-                  backdropFilter: "blur(40px)",
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
-                  boxShadow: "rgba(0, 0, 0, 0.4) 0px 25px 50px -12px"
+                  background: "rgba(10, 20, 20, 0.35)", 
+                  backdropFilter: "blur(24px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.25)"
                 }}
               >
                 {/* Decorative floating circular accent to draw eye */}
