@@ -508,12 +508,15 @@ export default function App() {
       {/* Dynamic Background Image - high-fidelity koi pond backdrop */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#0a1614]">
         <img 
-          src="/koifish_background.jpeg" 
+          src="/koifish-bg.jpeg" 
           alt="Koi Pond Background" 
-          className="w-full h-full object-cover transition-all duration-700 ease-in-out"
-          style={{ objectPosition: "50.436% center" }}
+          className="w-full h-full object-cover object-center transition-all duration-700 ease-in-out"
+          style={{ objectFit: "cover", objectPosition: "center" }}
           onError={(e) => {
-            if (koiPondBackground && e.currentTarget.src !== koiPondBackground) {
+            const currentSrc = e.currentTarget.src;
+            if (!currentSrc.includes("KoiFish%20Background.jpeg") && !currentSrc.includes("KoiFish Background.jpeg")) {
+              e.currentTarget.src = "/KoiFish Background.jpeg";
+            } else if (koiPondBackground && currentSrc !== koiPondBackground) {
               e.currentTarget.src = koiPondBackground;
             }
           }}
