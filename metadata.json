@@ -1,0 +1,6 @@
+{
+  "name": "RIPPL",
+  "description": "A tranquil wellness and mood-tracking application.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
