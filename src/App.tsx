@@ -122,7 +122,7 @@ const formatDateKey = (year: number, month: number, day: number): string => {
   return `${year}-${m}-${d}`;
 };
 
-// Seed initial calendar history for the current real month if localStorage is empty
+// Get initial calendar history from localStorage, or return empty object if none exists
 const getInitialCalendarHistory = (): Record<string, string> => {
   const saved = localStorage.getItem("koi_calendar_history");
   if (saved) {
@@ -133,27 +133,7 @@ const getInitialCalendarHistory = (): Record<string, string> => {
     }
   }
 
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = now.getMonth();
-  const initial: Record<string, string> = {};
-
-  const sampleDays = [
-    { day: 2, mood: "calm" },
-    { day: 5, mood: "content" },
-    { day: 8, mood: "happy" },
-    { day: 12, mood: "anxious" },
-    { day: 15, mood: "sad" },
-    { day: 18, mood: "content" },
-  ];
-
-  sampleDays.forEach(({ day, mood }) => {
-    if (day <= now.getDate()) {
-      initial[formatDateKey(y, m, day)] = mood;
-    }
-  });
-
-  return initial;
+  return {};
 };
 
 interface ActivityConfig {
@@ -526,12 +506,17 @@ export default function App() {
   return (
     <div id="koi-app" className="relative min-h-screen text-[#e1e3e2] select-none flex flex-col items-center">
       {/* Dynamic Background Image - high-fidelity koi pond backdrop */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-[#0a1614]">
         <img 
-          src={koiPondBackground || "/koifish_background.jpeg"} 
+          src="/koifish_background.jpeg" 
           alt="Koi Pond Background" 
           className="w-full h-full object-cover transition-all duration-700 ease-in-out"
           style={{ objectPosition: "50.436% center" }}
+          onError={(e) => {
+            if (koiPondBackground && e.currentTarget.src !== koiPondBackground) {
+              e.currentTarget.src = koiPondBackground;
+            }
+          }}
         />
       </div>
 
