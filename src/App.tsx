@@ -26,11 +26,13 @@ import {
   Menu,
   RefreshCw,
   Award,
-  Notebook
+  Notebook,
+  BarChart2
 } from "lucide-react";
 import { EmotionalPebble, MoodConfig, WARM_WHITE_MOOD } from "./components/EmotionalPebble";
 import { KoiFishIcon } from "./components/KoiFishIcon";
 import { generateDynamicOrganicReflection } from "./lib/guidance";
+import { MoodStatsView } from "./components/MoodStatsView";
 
 const MOODS: MoodConfig[] = [
   { 
@@ -50,22 +52,6 @@ const MOODS: MoodConfig[] = [
     calDot: "bg-yellow-300 shadow-[0_0_8px_rgba(253,224,71,0.9)]"
   },
   { 
-    id: "content", 
-    label: "Content", 
-    colorClass: "bg-amber-400", 
-    glowClass: "glow-orange", 
-    textColor: "text-amber-200",
-    gradient: "from-amber-300 to-orange-400",
-    orbGradient: "radial-gradient(circle at 50% 20%, #FFF3B0 0%, #FFAA80 50%, #FF7B42 100%)",
-    selectorGradient: "radial-gradient(circle, #FF8A50 0%, #FFFFFF 100%)",
-    glowColor: "rgba(255, 123, 66, 0.75)",
-    solidColor: "#FF8A50",
-    textColorHex: "#FFAA80",
-    calBgOverlay: "bg-amber-500/25 border-amber-300/60 shadow-[inset_0_0_12px_rgba(251,191,36,0.35)]",
-    calBorder: "border-amber-400/60",
-    calDot: "bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.9)]"
-  },
-  { 
     id: "calm", 
     label: "Calm", 
     colorClass: "bg-teal-300", 
@@ -80,6 +66,22 @@ const MOODS: MoodConfig[] = [
     calBgOverlay: "bg-teal-500/25 border-teal-300/60 shadow-[inset_0_0_12px_rgba(45,212,191,0.35)]",
     calBorder: "border-teal-400/60",
     calDot: "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"
+  },
+  { 
+    id: "tired", 
+    label: "Tired", 
+    colorClass: "bg-slate-400", 
+    glowClass: "glow-gray", 
+    textColor: "text-slate-300",
+    gradient: "from-slate-300 to-gray-500",
+    orbGradient: "radial-gradient(circle at 50% 20%, #E2E8F0 0%, #94A3B8 50%, #475569 100%)",
+    selectorGradient: "radial-gradient(circle, #94A3B8 0%, #FFFFFF 100%)",
+    glowColor: "rgba(148, 163, 184, 0.75)",
+    solidColor: "#94A3B8",
+    textColorHex: "#CBD5E1",
+    calBgOverlay: "bg-slate-500/25 border-slate-400/60 shadow-[inset_0_0_12px_rgba(148,163,184,0.35)]",
+    calBorder: "border-slate-400/60",
+    calDot: "bg-slate-300 shadow-[0_0_8px_rgba(203,213,225,0.9)]"
   },
   { 
     id: "anxious", 
@@ -112,6 +114,38 @@ const MOODS: MoodConfig[] = [
     calBgOverlay: "bg-indigo-500/25 border-indigo-300/60 shadow-[inset_0_0_12px_rgba(129,140,248,0.35)]",
     calBorder: "border-indigo-400/60",
     calDot: "bg-indigo-300 shadow-[0_0_8px_rgba(165,180,252,0.9)]"
+  },
+  { 
+    id: "disgust", 
+    label: "Disgust", 
+    colorClass: "bg-emerald-500", 
+    glowClass: "glow-green", 
+    textColor: "text-emerald-300",
+    gradient: "from-emerald-400 to-green-600",
+    orbGradient: "radial-gradient(circle at 50% 20%, #A7F3D0 0%, #10B981 50%, #047857 100%)",
+    selectorGradient: "radial-gradient(circle, #10B981 0%, #FFFFFF 100%)",
+    glowColor: "rgba(16, 185, 129, 0.75)",
+    solidColor: "#10B981",
+    textColorHex: "#6EE7B7",
+    calBgOverlay: "bg-emerald-500/25 border-emerald-400/60 shadow-[inset_0_0_12px_rgba(16,185,129,0.35)]",
+    calBorder: "border-emerald-400/60",
+    calDot: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]"
+  },
+  { 
+    id: "anger", 
+    label: "Anger", 
+    colorClass: "bg-red-500", 
+    glowClass: "glow-red", 
+    textColor: "text-red-300",
+    gradient: "from-red-400 to-rose-600",
+    orbGradient: "radial-gradient(circle at 50% 20%, #FFB3B3 0%, #EF4444 50%, #B91C1C 100%)",
+    selectorGradient: "radial-gradient(circle, #EF4444 0%, #FFFFFF 100%)",
+    glowColor: "rgba(239, 68, 68, 0.75)",
+    solidColor: "#EF4444",
+    textColorHex: "#FCA5A5",
+    calBgOverlay: "bg-red-500/25 border-red-400/60 shadow-[inset_0_0_12px_rgba(239,68,68,0.35)]",
+    calBorder: "border-red-400/60",
+    calDot: "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.9)]"
   },
 ];
 
@@ -286,8 +320,20 @@ export default function App() {
   const today = new Date();
   const todayKey = formatDateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
-  const [currentScreen, setCurrentScreen] = useState<"welcome" | "selector" | "reflection">("welcome");
+  // Check if saved state is from today or an older date (starting 12:00 AM)
+  const lastActiveDate = (() => {
+    try {
+      return localStorage.getItem("koi_last_active_date");
+    } catch {
+      return null;
+    }
+  })();
+  const isNewDayOnInit = lastActiveDate !== todayKey;
+
+  const [currentScreen, setCurrentScreen] = useState<"welcome" | "selector" | "reflection" | "stats">("welcome");
+  const [hoveredMood, setHoveredMood] = useState<MoodConfig | null>(null);
   const [selectedMood, setSelectedMood] = useState<MoodConfig | null>(() => {
+    if (isNewDayOnInit) return null;
     try {
       const saved = localStorage.getItem("koi_selected_mood");
       return saved ? JSON.parse(saved) : null;
@@ -296,6 +342,7 @@ export default function App() {
     }
   });
   const [selectedActivities, setSelectedActivities] = useState<string[]>(() => {
+    if (isNewDayOnInit) return [];
     try {
       const saved = localStorage.getItem("koi_selected_activities");
       return saved ? JSON.parse(saved) : [];
@@ -304,6 +351,7 @@ export default function App() {
     }
   });
   const [personalNote, setPersonalNote] = useState<string>(() => {
+    if (isNewDayOnInit) return "";
     try {
       return localStorage.getItem("koi_personal_note") || "";
     } catch {
@@ -315,6 +363,7 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [hasScrolledToGuidance, setHasScrolledToGuidance] = useState<boolean>(false);
   const [aiGuidance, setAiGuidance] = useState<string>(() => {
+    if (isNewDayOnInit) return "";
     try {
       return localStorage.getItem("koi_ai_guidance") || "";
     } catch {
@@ -328,12 +377,80 @@ export default function App() {
   const [calendarHistory, setCalendarHistory] = useState<Record<string, string>>(getInitialCalendarHistory);
   const [editingDateKey, setEditingDateKey] = useState<string | null>(null);
 
+  // Helper functions to seed and clear 30-day sample data for Mood Stats
+  const handleSeedSampleData = () => {
+    const sampleHistory: Record<string, string> = { ...calendarHistory };
+    const moodOptions = ["happy", "calm", "tired", "anxious", "sad", "disgust", "anger", "calm", "happy", "tired"];
+    const now = new Date();
+    for (let i = 0; i < 30; i++) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      const key = formatDateKey(d.getFullYear(), d.getMonth(), d.getDate());
+      if (!sampleHistory[key]) {
+        const pseudoIndex = (d.getDate() * 7 + d.getMonth() * 3 + i) % moodOptions.length;
+        sampleHistory[key] = moodOptions[pseudoIndex];
+      }
+    }
+    setCalendarHistory(sampleHistory);
+    localStorage.setItem("koi_calendar_history", JSON.stringify(sampleHistory));
+  };
+
+  const handleClearSampleData = () => {
+    const cleared: Record<string, string> = {};
+    if (selectedMood && selectedMood.id !== "unselected") {
+      cleared[todayKey] = selectedMood.id;
+    }
+    setCalendarHistory(cleared);
+    localStorage.setItem("koi_calendar_history", JSON.stringify(cleared));
+  };
+
+  // Track active date and handle 12:00 AM midnight rollover automatically
+  useEffect(() => {
+    localStorage.setItem("koi_last_active_date", todayKey);
+
+    const checkDateRollover = () => {
+      const now = new Date();
+      const currentTodayKey = formatDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+      const storedLastDate = localStorage.getItem("koi_last_active_date");
+
+      if (storedLastDate && storedLastDate !== currentTodayKey) {
+        // Daily reset starting 12:00 AM midnight: go back to unselected mood
+        setSelectedMood(null);
+        setSelectedActivities([]);
+        setPersonalNote("");
+        setAiGuidance("");
+        localStorage.removeItem("koi_selected_mood");
+        localStorage.removeItem("koi_selected_activities");
+        localStorage.removeItem("koi_personal_note");
+        localStorage.removeItem("koi_ai_guidance");
+        localStorage.setItem("koi_last_active_date", currentTodayKey);
+      }
+    };
+
+    const interval = setInterval(checkDateRollover, 10000);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        checkDateRollover();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [todayKey]);
+
   // Persist selected mood, activities, note, and guidance to localStorage
   useEffect(() => {
     if (selectedMood) {
       localStorage.setItem("koi_selected_mood", JSON.stringify(selectedMood));
+      localStorage.setItem("koi_last_active_date", todayKey);
+    } else {
+      localStorage.removeItem("koi_selected_mood");
     }
-  }, [selectedMood]);
+  }, [selectedMood, todayKey]);
 
   useEffect(() => {
     localStorage.setItem("koi_selected_activities", JSON.stringify(selectedActivities));
@@ -346,6 +463,8 @@ export default function App() {
   useEffect(() => {
     if (aiGuidance) {
       localStorage.setItem("koi_ai_guidance", aiGuidance);
+    } else {
+      localStorage.removeItem("koi_ai_guidance");
     }
   }, [aiGuidance]);
 
@@ -545,7 +664,7 @@ export default function App() {
             <button 
               onClick={() => { setCurrentScreen("welcome"); setSelectedActivities([]); setSelectedMood(null); setActiveNav("home"); }}
               className={`text-xs md:text-sm tracking-widest uppercase py-1 border-b-2 transition-all cursor-pointer ${
-                activeNav === "home" && currentScreen === "welcome"
+                currentScreen === "welcome"
                   ? "text-teal-300 border-teal-300 font-semibold" 
                   : "text-[#bfc8c7] border-transparent opacity-80 hover:text-white hover:opacity-100"
               }`}
@@ -573,6 +692,17 @@ export default function App() {
               }`}
             >
               REFLECTION
+            </button>
+            <span className="text-[#bfc8c7]/30">|</span>
+            <button 
+              onClick={() => { setCurrentScreen("stats"); setActiveNav("stats"); }}
+              className={`text-xs md:text-sm tracking-widest uppercase py-1 border-b-2 transition-all cursor-pointer ${
+                currentScreen === "stats"
+                  ? "text-teal-300 border-teal-300 font-semibold"
+                  : "text-[#bfc8c7] border-transparent opacity-80 hover:text-white hover:opacity-100"
+              }`}
+            >
+              MOOD STATS
             </button>
           </nav>
 
@@ -670,6 +800,22 @@ export default function App() {
               >
                 <span>REFLECTION</span>
                 {currentScreen === "reflection" && <span className="w-2 h-2 rounded-full bg-teal-300" />}
+              </button>
+
+              <button
+                onClick={() => {
+                  setCurrentScreen("stats");
+                  setActiveNav("stats");
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-xl text-xs uppercase tracking-widest transition-all cursor-pointer flex items-center justify-between ${
+                  currentScreen === "stats"
+                    ? "bg-teal-500/20 text-teal-300 border border-teal-400/40 font-semibold"
+                    : "text-[#bfc8c7] hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <span>MOOD STATS</span>
+                {currentScreen === "stats" && <span className="w-2 h-2 rounded-full bg-teal-300" />}
               </button>
             </motion.div>
           )}
@@ -769,78 +915,115 @@ export default function App() {
                     boxShadow: "0 20px 40px rgba(0, 0, 0, 0.25)"
                   }}
                 >
-                  <div className="text-center mt-1 sm:mt-2 z-10">
+                  <div className="text-center mt-1 sm:mt-2 z-10 flex flex-col items-center">
                     <h2 className="text-lg sm:text-xl md:text-2xl font-light tracking-widest text-white leading-tight uppercase">
                       HOW ARE YOU<br />FEELING TODAY?
                     </h2>
-                    <p className="text-[11px] sm:text-xs text-[#bfc8c7] tracking-wider uppercase mt-1 opacity-75">
-                      {selectedMood ? `Selected: ${selectedMood.label}` : "Touch an emotional pebble below"}
-                    </p>
+                    
+                    {/* Dynamic Mood Badge / Subtitle */}
+                    <div className="mt-2.5 min-h-[32px] flex items-center justify-center">
+                      {(() => {
+                        const activeMood = hoveredMood || selectedMood;
+                        if (activeMood) {
+                          return (
+                            <div 
+                              className="px-4 py-1 rounded-full border flex items-center gap-2 backdrop-blur-md transition-all duration-300 shadow-md animate-fadeIn"
+                              style={{
+                                background: "rgba(255, 255, 255, 0.12)",
+                                borderColor: activeMood.solidColor,
+                              }}
+                            >
+                              <span 
+                                className="w-2.5 h-2.5 rounded-full shadow-sm" 
+                                style={{ background: activeMood.selectorGradient }}
+                              />
+                              <span className={`text-xs font-semibold tracking-wider uppercase ${activeMood.textColor}`}>
+                                {activeMood.label}
+                              </span>
+                            </div>
+                          );
+                        }
+                        return (
+                          <p className="text-[11px] sm:text-xs text-[#bfc8c7] tracking-wider uppercase opacity-75">
+                            Touch an emotional pebble below
+                          </p>
+                        );
+                      })()}
+                    </div>
                   </div>
 
-                  {/* Main central 3D emotional pebble with dynamic mood gradient */}
-                  <div className="my-2 sm:my-4 relative z-10 flex items-center justify-center w-full">
-                    <EmotionalPebble 
-                      mood={selectedMood} 
-                      size="responsive" 
-                    />
-                  </div>
+                  {/* Central 3D emotional pebble surrounded by curved radial mood selectors */}
+                  <div className="my-2 sm:my-4 relative z-10 flex items-center justify-center w-full min-h-[310px] sm:min-h-[380px] md:min-h-[410px] [--orb-radius:115px] xs:[--orb-radius:125px] sm:[--orb-radius:160px] md:[--orb-radius:175px]">
+                    
+                    {/* Center Mood Orb */}
+                    <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 z-10">
+                      <EmotionalPebble 
+                        mood={selectedMood} 
+                        size="responsive" 
+                      />
+                    </div>
 
-                  {/* Mood Selector Buttons arranged in a horseshoe arc beneath the main orb */}
-                  <div className="w-full flex justify-center items-start gap-1.5 sm:gap-4 md:gap-5 pt-1 sm:pt-2 pb-2 sm:pb-10 z-10 min-h-[85px] sm:min-h-[140px]">
+                    {/* Mood Selector Buttons arranged in a radial arc curving around the orb */}
                     {MOODS.map((mood, idx) => {
                       const isSelected = selectedMood?.id === mood.id;
-                      // Downward U-curve offsets for the 5 items: Happy, Content, Calm, Anxious, Sad
-                      const arcOffsets = [
-                        "-translate-y-1 sm:-translate-y-3",      // Happy (top-left)
-                        "translate-y-1 sm:translate-y-4",        // Content (mid-left)
-                        "translate-y-3 sm:translate-y-10",       // Calm (bottom-center)
-                        "translate-y-1 sm:translate-y-4",        // Anxious (mid-right)
-                        "-translate-y-1 sm:-translate-y-3",      // Sad (top-right)
-                      ];
+                      const isHovered = hoveredMood?.id === mood.id;
+                      // Arc from 170 deg (top-left) to 10 deg (top-right) wrapping around the bottom of the orb
+                      const angleDeg = 170 - idx * 26.66;
+                      const rad = (angleDeg * Math.PI) / 180;
+                      const cos = Math.cos(rad).toFixed(4);
+                      const sin = Math.sin(rad).toFixed(4);
 
                       return (
                         <div 
                           key={mood.id} 
-                          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-transform duration-300 ${arcOffsets[idx] || ""}`}
+                          className="absolute left-1/2 top-[40%] flex flex-col items-center gap-1 transition-all duration-300 z-20 pointer-events-auto group"
+                          style={{
+                            transform: `translate(calc(-50% + ${cos} * var(--orb-radius)), calc(-50% + ${sin} * var(--orb-radius)))`,
+                          }}
+                          onMouseEnter={() => setHoveredMood(mood)}
+                          onMouseLeave={() => setHoveredMood(null)}
                         >
                           {/* Concentric Bubble Selector */}
                           <button
                             onClick={() => setSelectedMood(mood)}
-                            className={`w-11 h-11 sm:w-15 sm:h-15 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 relative backdrop-blur-md ${
+                            className={`w-9 h-9 xs:w-10 xs:h-10 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 relative backdrop-blur-md ${
                               isSelected 
-                                ? "scale-110 sm:scale-115 z-10" 
-                                : "hover:scale-105 opacity-90 hover:opacity-100"
+                                ? "scale-115 z-30 ring-2 ring-white/90 shadow-[0_0_20px_rgba(255,255,255,0.5)]" 
+                                : "hover:scale-110 opacity-85 hover:opacity-100"
                             }`}
                             style={{
                               background: isSelected 
-                                ? "rgba(255, 255, 255, 0.22)" 
-                                : "rgba(255, 255, 255, 0.1)",
+                                ? "rgba(255, 255, 255, 0.28)" 
+                                : "rgba(255, 255, 255, 0.12)",
                               border: isSelected 
                                 ? "1.5px solid rgba(255, 255, 255, 0.95)" 
-                                : "1px solid rgba(255, 255, 255, 0.45)",
-                              boxShadow: "none"
+                                : "1px solid rgba(255, 255, 255, 0.4)",
                             }}
                           >
                             {/* Inner Radial Gradient Circle */}
                             <div 
-                              className="w-6 h-6 sm:w-9 sm:h-9 rounded-full transition-transform duration-300 relative flex items-center justify-center"
+                              className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full transition-transform duration-300 relative flex items-center justify-center"
                               style={{
                                 background: mood.selectorGradient,
                                 border: "1px solid rgba(255, 255, 255, 0.8)",
-                                boxShadow: "none"
                               }}
                             />
                           </button>
 
-                          {/* Text Label Underneath */}
-                          <span className={`text-[10px] sm:text-xs font-medium tracking-wide select-none transition-colors ${
-                            isSelected 
-                              ? "text-white font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]" 
-                              : "text-white/85 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
+                          {/* Hover/Selected Only Text Tooltip Badge under pebble */}
+                          <div className={`transition-all duration-200 pointer-events-none whitespace-nowrap px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 ${
+                            isSelected || isHovered
+                              ? "opacity-100 translate-y-0 scale-100"
+                              : "opacity-0 -translate-y-1 scale-90"
                           }`}>
-                            {mood.label}
-                          </span>
+                            <span className={`text-[9px] xs:text-[10px] sm:text-xs font-semibold tracking-wide select-none ${
+                              isSelected 
+                                ? "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]" 
+                                : mood.textColor
+                            }`}>
+                              {mood.label}
+                            </span>
+                          </div>
                         </div>
                       );
                     })}
@@ -1164,7 +1347,7 @@ export default function App() {
                     {/* Mood Color Legend */}
                     <div className="flex items-center justify-between mt-3 px-1 pt-2 border-t border-white/10">
                       <span className="text-[10px] text-[#bfc8c7]/60 uppercase tracking-wider font-medium">Mood Colors:</span>
-                      <div className="flex items-center gap-2 sm:gap-2.5">
+                      <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
                         {MOODS.map((m) => (
                           <div key={m.id} className="flex items-center gap-1.5 group relative cursor-pointer">
                             <span 
@@ -1265,8 +1448,19 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Primary interactive CTA button resetting/progressing flow */}
-                  <div id="return-to-pond-btn" className="mt-8 flex justify-center w-full z-10 pt-2 pb-2">
+                  {/* Primary interactive CTA buttons resetting/progressing flow */}
+                  <div id="return-to-pond-btn" className="mt-8 flex flex-col items-center gap-3 w-full z-10 pt-2 pb-2">
+                    <button 
+                      onClick={() => { 
+                        setCurrentScreen("stats"); 
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="w-full max-w-md py-3.5 px-6 rounded-full font-semibold uppercase tracking-widest text-xs cursor-pointer shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 bg-teal-500/20 hover:bg-teal-500/30 text-teal-200 border border-teal-300/40 backdrop-blur-sm"
+                    >
+                      <BarChart2 className="w-4 h-4 text-teal-300" />
+                      <span>View Mood Dashboard & Stats</span>
+                    </button>
+
                     <button 
                       onClick={() => { 
                         setCurrentScreen("welcome"); 
@@ -1282,6 +1476,30 @@ export default function App() {
                 </section>
 
               </div>
+            </motion.div>
+          )}
+
+          {/* ==================== SCREEN 4: MOOD STATS SCREEN ==================== */}
+          {currentScreen === "stats" && (
+            <motion.div
+              key="stats"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="w-full flex justify-center py-1 sm:py-4"
+            >
+              <MoodStatsView
+                calendarHistory={calendarHistory}
+                moods={MOODS}
+                onSelectDate={(dateKey) => setEditingDateKey(dateKey)}
+                onSeedSampleData={handleSeedSampleData}
+                onClearSampleData={handleClearSampleData}
+                onNavigateToHome={() => {
+                  setCurrentScreen("welcome");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              />
             </motion.div>
           )}
 
@@ -1332,7 +1550,7 @@ export default function App() {
               </div>
 
               {/* Mood Stones Selector */}
-              <div className="grid grid-cols-5 gap-2 my-2">
+              <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 my-2">
                 {MOODS.map((m) => {
                   const isCurrent = calendarHistory[editingDateKey] === m.id;
                   return (

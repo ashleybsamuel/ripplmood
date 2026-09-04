@@ -30,13 +30,14 @@ export function generateDynamicOrganicReflection(
 ): string {
   const userNote = note && note.trim() ? note.trim() : "";
   const has = (id: string) => activitiesList.includes(id);
-  const cleanMood = moodName || moodId || "calm";
+  const rawMood = moodName || moodId || "calm";
+  const cleanMood = rawMood.toLowerCase() === "anger" ? "angry" : rawMood.toLowerCase();
 
   let result = "";
 
   // 1. DIRECT REAL-LIFE SYNTHESIS WHEN USER NOTE IS PRESENT
   if (userNote) {
-    if (moodId === "anxious" || moodId === "sad") {
+    if (moodId === "anxious" || moodId === "sad" || moodId === "anger") {
       const openings = [
         `Processing thoughts like "${userNote}" when feeling ${cleanMood} takes a genuine emotional toll, but putting them into words lets the surface ripple settle.`,
         `Carrying "${userNote}" on a day where you're feeling ${cleanMood} feels heavy, like navigating deep, turbulent waters.`,
@@ -69,7 +70,7 @@ export function generateDynamicOrganicReflection(
       const ins = pickNonRepeating(insights);
       const cl = pickNonRepeating(closings);
       result = `${op} ${ins} ${cl}`;
-    } else if (moodId === "happy" || moodId === "content" || moodId === "calm") {
+    } else if (moodId === "happy" || moodId === "calm") {
       const openings = [
         `Noticing "${userNote}" captures a bright, joyful ripple that lit up your entire day.`,
         `Reflecting on "${userNote}" anchors a peaceful, clear momentum as your evening unfolds like still waters.`,
@@ -124,14 +125,14 @@ export function generateDynamicOrganicReflection(
     const part1: string[] = [];
 
     if (has("exam") || has("assignment")) {
-      if (moodId === "anxious" || moodId === "sad") {
+      if (moodId === "anxious" || moodId === "sad" || moodId === "anger" || moodId === "disgust" || moodId === "tired") {
         part1.push(
           `Pouring mental energy into study deadlines while feeling ${cleanMood} takes a lot of stamina, stirring up deep emotional waters.`,
           `Pushing through heavy academic tasks on a ${cleanMood} day takes a quiet toll on your momentum.`,
           `Navigating intense coursework today required real perseverance when your energy was running low.`,
           `Juggling study pressure alongside feeling ${cleanMood} is exhausting, so give yourself permission to step away from the current.`
         );
-      } else if (moodId === "happy" || moodId === "content") {
+      } else if (moodId === "happy" || moodId === "calm") {
         part1.push(
           `Making tangible progress on your academic goals today leaves you with a well-earned sense of smooth, clear accomplishment.`,
           `Crossing major assignments off your list today has lifted a real weight, letting your evening flow freely.`,
@@ -146,7 +147,7 @@ export function generateDynamicOrganicReflection(
         );
       }
     } else if (has("fresh_air") && has("sleep")) {
-      if (moodId === "anxious" || moodId === "sad") {
+      if (moodId === "anxious" || moodId === "sad" || moodId === "anger") {
         part1.push(
           `Even though you prioritized outdoor air and restful sleep today, it's completely natural if feeling ${cleanMood} still stirs below the surface.`,
           `Nourishing your body with good sleep and fresh air builds quiet resilience over time, helping the waters clear.`,
@@ -160,7 +161,7 @@ export function generateDynamicOrganicReflection(
         );
       }
     } else if (has("fresh_air")) {
-      if (moodId === "anxious" || moodId === "sad") {
+      if (moodId === "anxious" || moodId === "sad" || moodId === "anger") {
         part1.push(
           `Stepping outdoors for fresh air was a gentle step today, even if feeling ${cleanMood} still weighs on your heart.`,
           `Connecting with outdoor air gives your spirit a gentle breath of space when navigating ${cleanMood} feelings.`,
@@ -174,7 +175,7 @@ export function generateDynamicOrganicReflection(
         );
       }
     } else if (has("sleep")) {
-      if (moodId === "anxious" || moodId === "sad") {
+      if (moodId === "anxious" || moodId === "sad" || moodId === "anger") {
         part1.push(
           `Nourishing your body with good sleep provided essential rest today, even if feeling ${cleanMood} still lingers.`,
           `Prioritizing full rest gives your nervous system a gentle foundation, helping quiet feelings of ${cleanMood}.`,
@@ -188,7 +189,7 @@ export function generateDynamicOrganicReflection(
         );
       }
     } else if (has("alone")) {
-      if (moodId === "anxious" || moodId === "sad") {
+      if (moodId === "anxious" || moodId === "sad" || moodId === "anger") {
         part1.push(
           `Spending time alone when feeling ${cleanMood} can sometimes make inner thoughts echo louder across quiet waters.`,
           `Carving out solo time allowed you to step back to a peaceful shore, even if lingering ${cleanMood} thoughts felt close.`,
@@ -215,11 +216,23 @@ export function generateDynamicOrganicReflection(
           `Your positive spirits today created a light, uplifting ripple that naturally radiates outward.`,
           `Flowing through today with joy brought a wonderful, vibrant warmth to your hours.`
         );
-      } else if (moodId === "content" || moodId === "calm") {
+      } else if (moodId === "calm") {
         part1.push(
           `A steady, quiet sense of balance settled gracefully into your day like a clear, still pond.`,
           `Navigating your hours with a peaceful, grounded mindset gave today a smooth, easy flow.`,
           `Your calm energy today created a serene, anchored sanctuary wherever you went.`
+        );
+      } else if (moodId === "disgust") {
+        part1.push(
+          `When feelings of aversion or disgust arise, giving yourself room to step away and clear your slate allows quiet peace to return.`,
+          `Acknowledging feelings of disgust with gentle space lets the uncomfortable energy dissolve from your mind.`,
+          `Honoring feelings of disgust as a protective boundary signal helps you return to a clear, calm center.`
+        );
+      } else if (moodId === "tired") {
+        part1.push(
+          `When physical or mental fatigue weighs heavily, giving yourself full permission to surrender to rest is the gentlest choice.`,
+          `Navigating your day while feeling tired takes quiet effort, so let tonight be an unhurried harbor for recovery.`,
+          `Honoring your fatigue and slowing down allows your inner reservoir to naturally replenish.`
         );
       } else if (moodId === "anxious") {
         part1.push(
@@ -233,6 +246,12 @@ export function generateDynamicOrganicReflection(
           `Some days carry a heavier tide, and allowing yourself to feel without judgment takes true courage.`,
           `Treating yourself gently on a somber day allows your spirit to heal in tranquil quiet.`
         );
+      } else if (moodId === "anger") {
+        part1.push(
+          `When feelings of anger or frustration rise like a sudden wave, giving yourself space to pause by quiet waters helps cool the heat gently.`,
+          `Acknowledging feeling angry without judgment takes real honesty, allowing your mind to release tension and regain clarity.`,
+          `Honoring your anger as a valid signal allows the turbulent waters to quiet down into still reflection.`
+        );
       } else {
         part1.push(
           `Taking time to check in with yourself is like pausing by a calm pool to reflect.`,
@@ -244,7 +263,7 @@ export function generateDynamicOrganicReflection(
 
     // Part 2: Insight / Reframe
     const part2: string[] = [];
-    if (moodId === "anxious" || moodId === "sad") {
+    if (moodId === "anxious" || moodId === "sad" || moodId === "anger" || moodId === "disgust" || moodId === "tired") {
       part2.push(
         `Remember that difficult feelings are passing ripples, not a permanent reflection of your worth or future.`,
         `Stepping back from worries and allowing your mind to rest is essential for letting the water clear.`,
@@ -252,7 +271,7 @@ export function generateDynamicOrganicReflection(
         `Gentle self-compassion is the most soothing balm when thoughts feel overwhelming.`,
         `Focusing on taking just one calm breath at a time helps ease the waves and restore inner quiet.`
       );
-    } else if (moodId === "happy" || moodId === "content") {
+    } else if (moodId === "happy" || moodId === "calm") {
       part2.push(
         `Holding onto this sense of ease creates a strong, serene foundation for whatever comes next.`,
         `Savoring these bright moments sends peaceful ripples through your mind for lasting gratitude.`,
