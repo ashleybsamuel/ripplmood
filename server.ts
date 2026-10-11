@@ -85,26 +85,10 @@ app.post("/api/gemini/guidance", async (req, res) => {
 
     prompt += `\n\nWrite a 2-3 sentence personalized human reflection paragraph tailored specifically to this unique combination. Return ONLY the reflection text with no headers, quotes, or markdown.`;
 
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
-        contents: prompt,
-        config: {
-          systemInstruction,
-          temperature: 0.9,
-          topP: 0.95,
-        },
-      });
-
-      const guidance = response.text ? response.text.trim().replace(/^["']|["']$/g, "") : "";
-      if (guidance) {
-        return res.json({ guidance, source: "gemini-3.6-flash" });
-      }
-    } catch (_primaryError: any) {
-      // Primary model rate-limited or quota exceeded; attempt fallback model
+    if (process.env.GEMINI_API_KEY) {
       try {
-        const fallbackResponse = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
+        const response = await ai.models.generateContent({
+          model: "gemini-3.8-flash",
           contents: prompt,
           config: {
             systemInstruction,
@@ -113,12 +97,30 @@ app.post("/api/gemini/guidance", async (req, res) => {
           },
         });
 
-        const fallbackGuidance = fallbackResponse.text ? fallbackResponse.text.trim().replace(/^["']|["']$/g, "") : "";
-        if (fallbackGuidance) {
-          return res.json({ guidance: fallbackGuidance, source: "gemini-2.5-flash" });
+        const guidance = response.text ? response.text.trim().replace(/^["']|["']$/g, "") : "";
+        if (guidance) {
+          return res.json({ guidance, source: "gemini-3.8-flash" });
         }
-      } catch (_secondaryError: any) {
-        // Fallback model also rate-limited or quota exceeded
+      } catch (_primaryError: any) {
+        // Primary model rate-limited or quota exceeded; attempt fallback model
+        try {
+          const fallbackResponse = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+            config: {
+              systemInstruction,
+              temperature: 0.9,
+              topP: 0.95,
+            },
+          });
+
+          const fallbackGuidance = fallbackResponse.text ? fallbackResponse.text.trim().replace(/^["']|["']$/g, "") : "";
+          if (fallbackGuidance) {
+            return res.json({ guidance: fallbackGuidance, source: "gemini-2.5-flash" });
+          }
+        } catch (_secondaryError: any) {
+          // Fallback model also rate-limited or quota exceeded
+        }
       }
     }
 
